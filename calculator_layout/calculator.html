@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор | Лабораторная работа №1</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Дополнительное центрирование для всего контента */
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Центрирование рядов с кнопками */
+    .calculator-container > div:nth-child(2) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Центрирование выпадающего списка */
+    .dropdown-container select {
+      width: 100%;
+      max-width: 200px;
+    }
+
+    /* Кнопка GitHub на всю ширину */
+    .github-link {
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    /* Кнопка смены темы на всю ширину */
+    .theme-toggle-btn {
+      box-sizing: border-box;
+    }
+
+    /* Контейнер для кнопок - центрирование */
+    .calculator-container > div > div {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator-container">
+  <!-- блок с экраном калькулятора -->
+  <div id="result" class="result">
+    0
+  </div>
+
+  <!-- блок с кнопками калькулятора -->
+  <div>
+    <!-- ряд 1 -->
+    <div>
+      <button id="btn_op_clear" class="my-btn secondary">C</button>
+      <button id="btn_op_sign" class="my-btn secondary">+/-</button>
+      <button id="btn_op_percent" class="my-btn secondary">%</button>
+      <button id="btn_op_div" class="my-btn primary">/</button>
+    </div>
+
+    <!-- ряд 2 -->
+    <div>
+      <button id="btn_digit_7" class="my-btn">7</button>
+      <button id="btn_digit_8" class="my-btn">8</button>
+      <button id="btn_digit_9" class="my-btn">9</button>
+      <button id="btn_op_mult" class="my-btn primary">x</button>
+    </div>
+
+    <!-- ряд 3 -->
+    <div>
+      <button id="btn_digit_4" class="my-btn">4</button>
+      <button id="btn_digit_5" class="my-btn">5</button>
+      <button id="btn_digit_6" class="my-btn">6</button>
+      <button id="btn_op_minus" class="my-btn primary">-</button>
+    </div>
+
+    <!-- ряд 4 -->
+    <div>
+      <button id="btn_digit_1" class="my-btn">1</button>
+      <button id="btn_digit_2" class="my-btn">2</button>
+      <button id="btn_digit_3" class="my-btn">3</button>
+      <button id="btn_op_plus" class="my-btn primary">+</button>
+    </div>
+
+    <!-- ряд 5 -->
+    <div>
+      <button id="btn_digit_0" class="my-btn">0</button>
+      <button id="btn_digit_dot" class="my-btn">.</button>
+      <button id="btn_op_equal" class="my-btn primary execute">=</button>
+    </div>
+  </div>
+
+  <!-- ЗАДАНИЕ 12: Кнопка смены темы -->
+  <button id="themeToggle" class="theme-toggle-btn">🌓 Сменить тему</button>
+
+  <!-- ЗАДАНИЕ 17: Выпадающий список -->
+  <div class="dropdown-container">
+    <select class="theme-select" id="themeSelect">
+      <option value="dark" selected>🌙 Тёмная тема</option>
+      <option value="light">☀️ Светлая тема</option>
+    </select>
+  </div>
+
+  <!-- ЗАДАНИЕ 18: Сворачивающиеся подробности -->
+  <details>
+    <summary>📚 Об авторе</summary>
+    <p><strong>ФИО:</strong> Цориев Н.В.</p>
+    <p><strong>Группа:</strong> ИУ5-41Б</p>
+    <p><strong>Курс:</strong> 2</p>
+  </details>
+
+  <!-- ЗАДАНИЕ 19: Поле с целью ЛР и подсветкой слов -->
+  <div class="lab-goal">
+    <p><strong>🎯 Цель ЛР:</strong> <mark>знакомство</mark> с инструментами построения пользовательских интерфейсов:
+    <mark>HTML</mark>, <mark>CSS</mark></p>
+  </div>
+
+  <!-- ЗАДАНИЕ 9: Надпись "ЛР выполнена ФИО" -->
+  <div class="lab-info">
+    <p>📝 Лабораторная работа №1</p>
+    <p class="fio">✅ Выполнил: Цориев Н.В.</p>
+  </div>
+
+  <!-- ЗАДАНИЕ 16: Кнопка со ссылкой на GitHub -->
+  <a href="https://github.com/TsorievNV/PSP_3SEM" target="_blank" class="github-link">
+    🐙 GitHub репозиторий
+  </a>
+</div>
+
+<!-- JavaScript для смены темы -->
+<script>
+  const themeToggle = document.getElementById('themeToggle');
+  const themeSelect = document.getElementById('themeSelect');
+
+  function setTheme(theme) {
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    if (document.body.classList.contains('light-theme')) {
+      themeSelect.value = 'light';
+    } else {
+      themeSelect.value = 'dark';
+    }
+  });
+
+  themeSelect.addEventListener('change', (e) => {
+    setTheme(e.target.value);
+  });
+</script>
+
+</body>
+</html>
