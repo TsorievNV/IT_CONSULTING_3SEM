@@ -1,9 +1,3 @@
-// ========================================
-// ЛАБОРАТОРНАЯ РАБОТА №2
-// КАЛЬКУЛЯТОР КОНСАЛТИНГА ПО ИТ-БЕЗОПАСНОСТИ
-// Полный рабочий код по методичке
-// ========================================
-
 window.onload = function() {
     // ===== Переменные для хранения чисел и операций =====
     let a = ''           // Первое число
@@ -290,7 +284,6 @@ window.onload = function() {
         updateDisplay(`${total.toLocaleString()} ₽`)
     }
 
-    // ===== Смена темы (из 1-й ЛР) =====
     const themeToggle = document.getElementById('themeToggle')
     const themeSelect = document.getElementById('themeSelect')
 
