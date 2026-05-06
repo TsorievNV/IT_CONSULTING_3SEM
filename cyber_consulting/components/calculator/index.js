@@ -6,6 +6,23 @@ export class CalculatorComponent {
         this.hours = 5;
         this.urgency = 1;
         this.offices = 1;
+        this.a = '';      // для хранения числа с экрана (лямбда)
+        this.b = '';
+        this.selectedOperation = null;
+    }
+
+    // Факториал для Пуассона
+    factorial(n) {
+        if (n < 0) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let result = 1;
+        for (let i = 2; i <= n; i++) result *= i;
+        return result;
+    }
+
+    // Формула Пуассона
+    poissonProbability(lambda, k) {
+        return (Math.pow(lambda, k) * Math.exp(-lambda)) / this.factorial(k);
     }
 
     getHTML() {
@@ -60,6 +77,18 @@ export class CalculatorComponent {
 
                 <hr>
 
+                <!-- НОВАЯ КНОПКА ПУАССОНА -->
+                <div class="text-center mb-3">
+                    <button id="btn_poisson" class="btn btn-success" style="width: 100%;">
+                        <i class="fas fa-chart-line"></i> 📊 Рассчитать нагрузку
+                    </button>
+                    <small class="text-muted d-block mt-1">
+                        Прогноз вероятности инцидентов (λ → P(k))
+                    </small>
+                </div>
+
+                <hr>
+
                 <div class="text-center">
                     <h5>Итоговая стоимость:</h5>
                     <div class="total-price" id="totalCost">0 ₽</div>
@@ -76,29 +105,42 @@ export class CalculatorComponent {
     }
 
     calculateTotal() {
-        // Базовая стоимость = часы × ставка × срочность × количество офисов
         let baseCost = this.pricePerHour * this.hours * this.urgency * this.offices;
 
-        // Добавляем стоимость опций
         const optionReport = document.getElementById('optionReport')?.checked ? 5000 : 0;
         const optionSupport = document.getElementById('optionSupport')?.checked ? 3000 : 0;
         const optionUrgent = document.getElementById('optionUrgent')?.checked ? 10000 : 0;
 
         const total = baseCost + optionReport + optionSupport + optionUrgent;
-
         return Math.round(total);
     }
 
-    updateDisplay() {
-        const total = this.calculateTotal();
+    updateDisplay(value) {
         const totalElement = document.getElementById('totalCost');
         const hoursElement = document.getElementById('hoursValue');
 
-        if (totalElement) {
+        if (totalElement && value === undefined) {
+            const total = this.calculateTotal();
             totalElement.innerHTML = total.toLocaleString() + ' ₽';
+        } else if (totalElement && value !== undefined) {
+            totalElement.innerHTML = value;
         }
+
         if (hoursElement) {
-            hoursElement.innerHTML = this.hours + ' ч';
+            hoursElement.innerHTML = this.hours;
+        }
+    }
+
+    // Функция для отображения сообщений на экране калькулятора
+    showMessage(msg, duration = 2000) {
+        const totalElement = document.getElementById('totalCost');
+        if (totalElement) {
+            const originalText = totalElement.innerHTML;
+            totalElement.innerHTML = msg;
+            setTimeout(() => {
+                const newTotal = this.calculateTotal();
+                totalElement.innerHTML = newTotal.toLocaleString() + ' ₽';
+            }, duration);
         }
     }
 
@@ -110,6 +152,7 @@ export class CalculatorComponent {
         const optionReport = document.getElementById('optionReport');
         const optionSupport = document.getElementById('optionSupport');
         const optionUrgent = document.getElementById('optionUrgent');
+        const poissonBtn = document.getElementById('btn_poisson');
 
         const update = () => {
             this.hours = parseInt(hoursRange.value);
@@ -118,7 +161,49 @@ export class CalculatorComponent {
             this.updateDisplay();
         };
 
-        // Вешаем обработчики на все элементы
+        // Пуассон (расчёт нагрузки)
+        if (poissonBtn) {
+            poissonBtn.addEventListener('click', () => {
+                // Берём значение из поля "Количество часов" как λ
+                const lambda = this.hours;
+
+                if (lambda <= 0) {
+                    this.showMessage("Ошибка: λ > 0");
+                    return;
+                }
+
+                let k = prompt(`📊 Расчёт нагрузки по Пуассону\n\nВведите k (количество событий/инцидентов)\nλ (среднее) = ${lambda}`);
+                if (k === null) return;
+                k = parseInt(k);
+
+                if (isNaN(k) || k < 0) {
+                    this.showMessage("Ошибка: k ≥ 0");
+                    return;
+                }
+
+                const probability = this.poissonProbability(lambda, k);
+                const percent = (probability * 100).toFixed(6);
+
+                let message = '';
+                if (probability < 0.01) {
+                    message = `⚠️ Вероятность ${percent}% — очень низкая`;
+                } else if (probability < 0.1) {
+                    message = `📉 Вероятность ${percent}% — низкая`;
+                } else if (probability < 0.3) {
+                    message = `📊 Вероятность ${percent}% — средняя`;
+                } else {
+                    message = `⚠️ Вероятность ${percent}% — высокая!`;
+                }
+
+                this.showMessage(`P(${k}|λ=${lambda}) = ${percent}%`);
+                setTimeout(() => {
+                    alert(`📈 Результат расчёта Пуассона:\n\nP(${k}) при λ=${lambda} = ${percent}%\n\n${message}`);
+                }, 100);
+
+                console.log(`Пуассон: λ=${lambda}, k=${k}, P=${probability}, ${percent}%`);
+            });
+        }
+
         if (hoursRange) hoursRange.addEventListener('input', update);
         if (urgencySelect) urgencySelect.addEventListener('change', update);
         if (officesInput) officesInput.addEventListener('input', update);
@@ -127,7 +212,6 @@ export class CalculatorComponent {
         if (optionSupport) optionSupport.addEventListener('change', update);
         if (optionUrgent) optionUrgent.addEventListener('change', update);
 
-        // Первоначальный расчёт
         update();
     }
 
