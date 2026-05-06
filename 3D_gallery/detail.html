@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberConsult | 3D Просмотр</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="detail-container">
+        <div class="detail-header">
+            <h1 id="modelTitle">🛡️ CyberConsult</h1>
+            <a href="index.html" class="back-btn">← Назад к галерее</a>
+        </div>
+        <div class="detail-controls">
+            <button id="view-front">Вид спереди</button>
+            <button id="view-back">Вид сзади</button>
+            <button id="view-left">Вид слева</button>
+            <button id="view-right">Вид справа</button>
+            <button id="zoom-in">+ Приблизить</button>
+            <button id="zoom-out">- Отдалить</button>
+            <button id="reset-view">⟳ Сброс</button>
+        </div>
+        <div id="canvas-container"></div>
+    </div>
+
+    <script type="module" src="detail.js"></script>
+</body>
+</html>

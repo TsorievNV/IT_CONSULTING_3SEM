@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberConsult | 3D Галерея услуг</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>🛡️ CyberConsult</h1>
+        <p>3D-галерея услуг ИТ-консалтинга по кибербезопасности</p>
+        <div class="upload-area">
+            <label for="fileUpload" class="upload-btn">📁 Загрузить свою 3D-модель (.glb)</label>
+            <input type="file" id="fileUpload" accept=".glb" style="display: none;">
+        </div>
+    </header>
+
+    <main>
+        <div class="gallery-title">
+            <h2>Наши услуги</h2>
+            <p>Кликните на карточку для детального просмотра 3D-модели</p>
+        </div>
+        <div id="gallery" class="gallery-grid"></div>
+
+        <div class="gallery-title" style="margin-top: 50px;">
+            <h2>Загруженные модели</h2>
+        </div>
+        <div id="userGallery" class="gallery-grid"></div>
+    </main>
+
+    <footer>
+        <p>© 2025 CyberConsult | ИТ-консалтинг по кибербезопасности</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
