@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ДЗ1 | JS задачи</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', monospace;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        h1 { color: #ff9800; }
+        .result {
+            background: #0f0f1a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #ff9800;
+        }
+        .result strong {
+            color: #ff9800;
+        }
+        pre {
+            background: #0f0f1a;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        hr { border-color: #333; }
+    </style>
+</head>
+<body>
+    <h1>📚 Домашнее задание №1</h1>
+    <p>Вариант: <strong></strong> 2.12, <strong></strong> 3.1, <strong></strong> 1.3, 1.8</p>
+    <hr>
+
+    <div id="results"></div>
+
+    <script>
+        // ========== 1 УРОВЕНЬ ==========
+
+        // Задание 1.3: Сумма квадратов
+        function sumOfSquares(arr) {
+            let sum = 0;
+            for (let i = 0; i < arr.length; i++) {
+                sum += arr[i] * arr[i];
+            }
+            return sum;
+        }
+
+        // Задание 1.8: Среднее арифметическое
+        function average(arr) {
+            if (arr.length === 0) return 0;
+            let sum = 0;
+            for (let i = 0; i < arr.length; i++) {
+                sum += arr[i];
+            }
+            return sum / arr.length;
+        }
+
+        // ========== 2 УРОВЕНЬ ==========
+
+        // Задание 2.12: isEqual
+        function isEqual(a, b) {
+            if (a === b) return true;
+            if (typeof a !== typeof b) return false;
+            if (a === null || b === null) return a === b;
+            if (typeof a !== 'object') return a === b;
+
+            const isArrayA = Array.isArray(a);
+            const isArrayB = Array.isArray(b);
+            if (isArrayA !== isArrayB) return false;
+
+            if (isArrayA) {
+                if (a.length !== b.length) return false;
+                for (let i = 0; i < a.length; i++) {
+                    if (!isEqual(a[i], b[i])) return false;
+                }
+                return true;
+            }
+
+            const keysA = Object.keys(a);
+            const keysB = Object.keys(b);
+            if (keysA.length !== keysB.length) return false;
+
+            for (let key of keysA) {
+                if (!b.hasOwnProperty(key)) return false;
+                if (!isEqual(a[key], b[key])) return false;
+            }
+            return true;
+        }
+
+        // ========== 3 УРОВЕНЬ ==========
+
+        // Задание 3.1: merge
+        function merge(...objects) {
+            const result = {};
+            for (let obj of objects) {
+                for (let key in obj) {
+                    if (!(key in result)) {
+                        result[key] = obj[key];
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(title, code, result) {
+            const block = document.createElement('div');
+            block.className = 'result';
+            block.innerHTML = `
+                <strong>${title}</strong>
+                <pre>${code}</pre>
+                <div>📌 Результат: <strong>${typeof result === 'object' ? JSON.stringify(result) : result}</strong></div>
+            `;
+            resultsDiv.appendChild(block);
+        }
+
+        // 1.3
+        addResult('1.3 Сумма квадратов',
+            'sumOfSquares([1, 2, 3, 4])',
+            sumOfSquares([1, 2, 3, 4]));
+
+        // 1.8
+        addResult('1.8 Среднее арифметическое',
+            'average([10, 20, 30, 40])',
+            average([10, 20, 30, 40]));
+
+        // 2.12
+        addResult('2.12 isEqual (массивы)',
+            'isEqual([1, 2, 3], [1, 2, 3])',
+            isEqual([1, 2, 3], [1, 2, 3]));
+
+        addResult('2.12 isEqual (объекты)',
+            'isEqual({a: 1, b: 2}, {a: 1, b: 2})',
+            isEqual({a: 1, b: 2}, {a: 1, b: 2}));
+
+        // 3.1
+        addResult('3.1 merge',
+            'merge({a: 1}, {b: 2}, {a: 3})',
+            merge({a: 1}, {b: 2}, {a: 3}));
+
+        addResult('3.1 merge',
+            'merge({x: 10}, {y: 20}, {z: 30})',
+            merge({x: 10}, {y: 20}, {z: 30}));
+    </script>
+</body>
+</html>
