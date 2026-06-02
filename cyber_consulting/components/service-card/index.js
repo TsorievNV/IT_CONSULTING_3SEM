@@ -17,7 +17,7 @@ export class ServiceCardComponent {
                 </div>
             </div>
         `;
-    }
+    }ы
 
     addListeners(data, listener) {
         document.getElementById(`btn-service-${data.id}`)?.addEventListener('click', listener);

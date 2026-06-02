@@ -80,7 +80,7 @@ export class CalculatorComponent {
                 <!-- НОВАЯ КНОПКА ПУАССОНА -->
                 <div class="text-center mb-3">
                     <button id="btn_poisson" class="btn btn-success" style="width: 100%;">
-                        <i class="fas fa-chart-line"></i> 📊 Рассчитать нагрузку
+                        <i class="fas fa-chart-line"></i>  Рассчитать нагрузку
                     </button>
                     <small class="text-muted d-block mt-1">
                         Прогноз вероятности инцидентов (λ → P(k))

@@ -1,169 +1,135 @@
-import { ServiceCardComponent } from "../../components/service-card/index.js";
+import { ajax } from "../../modules/ajax.js";
+import { serviceUrls } from "../../modules/urls.js";
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+
+function initPreview(containerId, modelPath) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f0f1a);
+
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(1.5, 1.2, 1.8);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0x0f0f1a, 1);
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0x606060);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(2, 3, 2);
+    scene.add(dirLight);
+
+    const loader = new GLTFLoader();
+    let model = null;
+
+    loader.load(modelPath, (gltf) => {
+        model = gltf.scene;
+        scene.add(model);
+    }, undefined, (error) => {
+        console.error('Ошибка загрузки модели:', modelPath, error);
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (model) model.rotation.y += 0.005;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    new ResizeObserver(() => {
+        const w = container.clientWidth, h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+    }).observe(container);
+}
+
+function getModelFileName(title) {
+    if (title.includes("Аудит")) return "shield";
+    if (title.includes("Тестирование")) return "lock";
+    if (title.includes("Анализ") || title.includes("SIEM")) return "server";
+    if (title.includes("Обучение")) return "classroom";
+    return "shield";
+}
 
 export class MainPage {
     constructor(parent) {
         this.parent = parent;
     }
 
-    getServices() {
-        return [
-            { id: 1, icon: "🛡️", title: "Аудит кибербезопасности", description: "Комплексная проверка защищенности ИТ-инфраструктуры", price: 5000 },
-            { id: 2, icon: "🔐", title: "Тестирование на проникновение", description: "Эмуляция атак реальных хакеров", price: 7000 },
-            { id: 3, icon: "📊", title: "Анализ защищенности", description: "Оценка рисков и соответствие стандартам", price: 6000 },
-            { id: 4, icon: "⚙️", title: "Внедрение SIEM", description: "Система сбора и анализа событий", price: 8000 },
-            { id: 5, icon: "👨‍🏫", title: "Обучение сотрудников", description: "Повышение осведомленности о киберугрозах", price: 4000 },
-            { id: 6, icon: "💻", title: "Аудит серверных мощностей", description: "Проверка серверов и оборудования", price: 5500 },
-            { id: 7, icon: "🌐", title: "Аудит сетевой топологии", description: "Анализ сетевой инфраструктуры", price: 4500 },
-            { id: 8, icon: "📦", title: "Аудит системного ПО", description: "Проверка программного обеспечения", price: 3500 }
-        ];
+    getHTML() {
+        return `<div id="services-list" class="row"></div>`;
     }
 
-    getHTML() {
-        return `
-            <div class="hero">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <h1>АУДИТ ИТ-СИСТЕМ</h1>
-                            <p>Проведем аудит ИТ-окружения вашей компании. Дадим рекомендации по улучшению системы и снижению затрат на ИТ-инфраструктуру. При необходимости поможем с реализацией изменений.</p>
-                            <button class="btn-orange" id="hero-request">Оставить заявку</button>
-                        </div>
-                        <div class="col-md-5">
-                            <img src="https://img.icons8.com/fluency/200/security-checked.png" alt="security" class="img-fluid">
-                        </div>
-                    </div>
-                </div>
-            </div>
+    renderServices(services, navigate) {
+        const servicesList = document.getElementById('services-list');
+        if (!servicesList) return;
+        servicesList.innerHTML = '';
 
-            <div class="container my-5">
-                <div class="section-title">
-                    <h2>Когда вам поможет аудит</h2>
-                </div>
-                <div class="row text-center mb-5">
-                    <div class="col-md-3">
-                        <div class="card-service p-3">
-                            <i class="fas fa-chart-line fa-3x" style="color:#ff9800"></i>
-                            <h5 class="mt-3">При росте бизнеса</h5>
-                            <p>Открытии новых офисов или увеличении сотрудников</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card-service p-3">
-                            <i class="fas fa-bullseye fa-3x" style="color:#ff9800"></i>
-                            <h5 class="mt-3">Цели и метрики</h5>
-                            <p>Разработка стратегии развития ИТ-инфраструктуры</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card-service p-3">
-                            <i class="fas fa-chart-pie fa-3x" style="color:#ff9800"></i>
-                            <h5 class="mt-3">План и бюджет</h5>
-                            <p>Оптимизация затрат на ИТ</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card-service p-3">
-                            <i class="fas fa-shield-virus fa-3x" style="color:#ff9800"></i>
-                            <h5 class="mt-3">Киберугрозы</h5>
-                            <p>Защита от современных атак</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        services.forEach(service => {
+            // Проверка id
+            const actualId = Number(service.id);
+            if (isNaN(actualId)) {
+                console.error('ID не число, пропускаем:', service);
+                return;
+            }
 
-            <div class="container my-5">
-                <div class="section-title">
-                    <h2>Наши услуги</h2>
-                </div>
-                <div id="services-list" class="row"></div>
-                <div class="text-center mt-4">
-                    <button class="btn btn-outline-primary" id="all-services-btn">Все услуги →</button>
-                </div>
-            </div>
+            console.log('service.id:', service.id, typeof service.id);
 
-            <div class="container my-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="calculator-card" id="calculator-placeholder"></div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="request-form">
-                            <h3>Оставьте заявку</h3>
-                            <p>Мы свяжемся с вами в течение дня. Обсудим вашу задачу, расскажем подробнее об аудите и рассчитаем окончательную стоимость.</p>
-                            <button class="btn btn-primary w-100" id="request-btn">Оставить заявку</button>
-                        </div>
+            const col = document.createElement('div');
+            col.className = 'col-md-3 mb-4';
+            col.innerHTML = `
+                <div class="card-service text-center p-3">
+                    <div id="preview-${service.id}" style="height: 180px; background: #0f0f1a; border-radius: 12px;"></div>
+                    <h5 class="mt-3">${service.name}</h5>
+                    <p>${service.description || ''}</p>
+                    <div>
+                        <button class="btn btn-sm btn-primary view-btn">Подробнее</button>
+                        <button class="btn btn-sm btn-warning edit-btn ms-2">✏️ Редактировать</button>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+            servicesList.appendChild(col);
+
+            const modelFile = getModelFileName(service.name);
+            initPreview(`preview-${service.id}`, `./${modelFile}.glb`);
+
+            const viewBtn = col.querySelector('.view-btn');
+            if (viewBtn) {
+                viewBtn.addEventListener('click', () => navigate('service', actualId, false));
+            }
+
+            const editBtn = col.querySelector('.edit-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigate('service', actualId, true);
+                });
+            }
+        });
+    }
+
+    loadServices(navigate) {
+        ajax.get(serviceUrls.getServices(), (data) => {
+            if (Array.isArray(data)) {
+                this.renderServices(data, navigate);
+            } else {
+                console.error('Ошибка загрузки услуг');
+            }
+        });
     }
 
     render(navigate) {
         this.parent.innerHTML = this.getHTML();
-
-        // Рендер карточек услуг (первые 4)
-        const servicesList = document.getElementById('services-list');
-        const services = this.getServices().slice(0, 4);
-
-        services.forEach(service => {
-            const card = new ServiceCardComponent(servicesList);
-            card.render(service, (e) => {
-                navigate('service', service);
-            });
-        });
-
-        // Кнопка "Все услуги"
-        document.getElementById('all-services-btn')?.addEventListener('click', () => {
-            navigate('services');
-        });
-
-        // Кнопка заявки
-        document.getElementById('hero-request')?.addEventListener('click', () => {
-            navigate('request');
-        });
-        document.getElementById('request-btn')?.addEventListener('click', () => {
-            navigate('request');
-        });
-
-        // Калькулятор (краткая форма)
-        const calcContainer = document.getElementById('calculator-placeholder');
-        calcContainer.innerHTML = `
-            <h4><i class="fas fa-calculator"></i> Калькулятор стоимости</h4>
-            <div class="mb-3">
-                <label>Количество часов консультации:</label>
-                <input type="range" id="quickHours" class="form-range" min="1" max="40" value="5">
-                <span id="quickHoursValue" class="badge bg-secondary mt-2">5 ч</span>
-            </div>
-            <div class="mb-3">
-                <label>Тип услуги:</label>
-                <select id="quickService" class="form-select">
-                    <option value="5000">Аудит безопасности (5000 ₽/ч)</option>
-                    <option value="7000">Pentest (7000 ₽/ч)</option>
-                    <option value="6000">Анализ защищенности (6000 ₽/ч)</option>
-                </select>
-            </div>
-            <hr>
-            <div class="text-center">
-                <h5>Примерная стоимость:</h5>
-                <div class="total-price" id="quickTotal">25 000 ₽</div>
-            </div>
-        `;
-
-        const hoursRange = document.getElementById('quickHours');
-        const hoursValue = document.getElementById('quickHoursValue');
-        const serviceSelect = document.getElementById('quickService');
-        const totalSpan = document.getElementById('quickTotal');
-
-        const updateQuickCalc = () => {
-            const hours = parseInt(hoursRange.value);
-            const price = parseInt(serviceSelect.value);
-            const total = hours * price;
-            hoursValue.innerHTML = hours + ' ч';
-            totalSpan.innerHTML = total.toLocaleString() + ' ₽';
-        };
-
-        hoursRange.addEventListener('input', updateQuickCalc);
-        serviceSelect.addEventListener('change', updateQuickCalc);
-        updateQuickCalc();
+        this.loadServices(navigate);
     }
 }

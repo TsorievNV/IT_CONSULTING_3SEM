@@ -5,55 +5,60 @@ import { ServicesPage } from "./pages/services/index.js";
 import { ServicePage } from "./pages/service/index.js";
 import { RequestPage } from "./pages/request/index.js";
 
-// Состояние приложения
 let currentPage = 'main';
-let selectedService = null;
+let selectedSlug = null;
+let selectedId = null;
+let isEditMode = false;
 
-// Получаем корневой элемент
 const root = document.getElementById('root');
 
-// Функция рендера текущей страницы
 function renderPage() {
     root.innerHTML = '';
 
-    // Добавляем хедер
     const header = new HeaderComponent(root);
     header.render(navigateTo);
 
-    // Контейнер для контента
     const contentDiv = document.createElement('div');
     contentDiv.id = 'page-content';
     root.appendChild(contentDiv);
 
-    // Рендерим нужную страницу
     if (currentPage === 'main') {
         const mainPage = new MainPage(contentDiv);
         mainPage.render(navigateTo);
-    } else if (currentPage === 'services') {
+    }
+    else if (currentPage === 'services') {
         const servicesPage = new ServicesPage(contentDiv);
         servicesPage.render(navigateTo);
-    } else if (currentPage === 'service' && selectedService) {
-        const servicePage = new ServicePage(contentDiv, selectedService);
+    }
+    else if (currentPage === 'service' && selectedId) {
+        const servicePage = new ServicePage(contentDiv, selectedId, isEditMode);
         servicePage.render(navigateTo);
-    } else if (currentPage === 'request') {
+    }
+    else if (currentPage === 'request') {
         const requestPage = new RequestPage(contentDiv);
         requestPage.render(navigateTo);
     }
 
-    // Добавляем футер
     const footer = new FooterComponent(root);
     footer.render();
 }
 
-// Функция навигации
-function navigateTo(page, service = null) {
+function navigateTo(page, slug = null, id = null, edit = false) {
     currentPage = page;
-    selectedService = service;
-    renderPage();
+    selectedSlug = slug;
+    selectedId = id;
+    isEditMode = edit;
 
-    // Прокрутка вверх
+    // Обновляем URL в браузере (без перезагрузки)
+    if (page === 'service' && slug && typeof id === 'number' && !isNaN(id)) {
+        window.history.pushState({}, '', `/${slug}/${id}`);
+    }
+    else if (page === 'main') {
+        window.history.pushState({}, '', '/');
+    }
+
+    renderPage();
     window.scrollTo(0, 0);
 }
 
-// Запуск приложения
 renderPage();
