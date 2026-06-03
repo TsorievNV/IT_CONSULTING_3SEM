@@ -15,7 +15,7 @@ export class ServicePage {
             <div class="container my-4">
                 <div id="back-button-placeholder"></div>
                 <div class="card-service p-4">
-                    <h2>Редактирование услуги (просмотр)</h2>
+                    <h2>✏️ Редактирование услуги</h2>
                     <div class="mb-3">
                         <label class="form-label">Название</label>
                         <input type="text" id="editName" class="form-control" value="${this.service?.name || ''}">
@@ -27,6 +27,10 @@ export class ServicePage {
                     <div class="mb-3">
                         <label class="form-label">Цена (₽/час)</label>
                         <input type="number" id="editPrice" class="form-control" value="${this.service?.price || ''}">
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button id="saveServiceBtn" class="btn btn-success">💾 Сохранить</button>
+                        <button id="deleteServiceBtn" class="btn btn-danger">🗑️ Удалить</button>
                     </div>
                 </div>
             </div>
@@ -61,6 +65,52 @@ export class ServicePage {
         if (priceInput) priceInput.addEventListener('input', () => console.log('Изменена цена:', priceInput.value));
     }
 
+    async saveService() {
+        const updatedData = {
+            name: document.getElementById('editName').value,
+            description: document.getElementById('editDescription').value,
+            price: parseInt(document.getElementById('editPrice').value)
+        };
+
+        try {
+            const response = await fetch(serviceUrls.getServiceById(this.id), {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                alert('✅ Услуга сохранена');
+                window.location.reload();
+            } else {
+                alert('❌ Ошибка сохранения');
+            }
+        } catch (error) {
+            console.error('Ошибка PATCH:', error);
+            alert('❌ Ошибка сети');
+        }
+    }
+
+    async deleteService() {
+        if (!confirm('🗑️ Удалить эту услугу?')) return;
+
+        try {
+            const response = await fetch(serviceUrls.getServiceById(this.id), {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('✅ Услуга удалена');
+                window.location.href = '/';
+            } else {
+                alert('❌ Ошибка удаления');
+            }
+        } catch (error) {
+            console.error('Ошибка DELETE:', error);
+            alert('❌ Ошибка сети');
+        }
+    }
+
     render(navigate) {
         this.parent.innerHTML = this.getHTML();
 
@@ -78,10 +128,16 @@ export class ServicePage {
                 if (!this.isEdit) {
                     const editBtn = document.getElementById('editButton');
                     if (editBtn) {
-                        editBtn.addEventListener('click', () => navigate('service', this.id, true));
+                        editBtn.addEventListener('click', () => navigate('service', 'security_service', this.id, true));
                     }
                 } else {
                     this.bindFormData();
+
+                    const saveBtn = document.getElementById('saveServiceBtn');
+                    if (saveBtn) saveBtn.addEventListener('click', () => this.saveService());
+
+                    const deleteBtn = document.getElementById('deleteServiceBtn');
+                    if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteService());
                 }
             } else {
                 this.parent.innerHTML = '<p class="text-danger">Ошибка загрузки услуги</p>';

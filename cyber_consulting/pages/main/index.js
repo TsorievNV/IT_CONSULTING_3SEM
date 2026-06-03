@@ -105,14 +105,14 @@ export class MainPage {
 
             const viewBtn = col.querySelector('.view-btn');
             if (viewBtn) {
-                viewBtn.addEventListener('click', () => navigate('service', actualId, false));
+                viewBtn.addEventListener('click', () => navigate('service', 'security_service', actualId, false));
             }
 
             const editBtn = col.querySelector('.edit-btn');
             if (editBtn) {
                 editBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    navigate('service', actualId, true);
+                    navigate('service', 'security_service', actualId, true);
                 });
             }
         });

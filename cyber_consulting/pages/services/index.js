@@ -43,8 +43,14 @@ export class ServicesPage {
         }
 
         services.forEach(service => {
+            // Приводим данные сервера к формату, который ждёт ServiceCardComponent
+            const adaptedService = {
+                ...service,
+                title: service.name,
+                icon: service.icon || '📋'
+            };
             const card = new ServiceCardComponent(servicesList);
-            card.render(service, () => navigate('service', service.id));
+            card.render(adaptedService, () => navigate('service', 'security_service', service.id, false));
         });
     }
 
@@ -70,7 +76,7 @@ export class ServicesPage {
         // Загружаем услуги с сервера
         this.loadServices(navigate);
 
-        // Поиск (фильтрация по загруженным данным)
+        // Поиск
         const searchInput = document.getElementById('searchInput');
         const searchBtn = document.getElementById('searchBtn');
         const clearBtn = document.getElementById('clearSearchBtn');
