@@ -9,10 +9,16 @@ let currentPage = 'main';
 let selectedSlug = null;
 let selectedId = null;
 let isEditMode = false;
+let currentServicePage = null;
 
 const root = document.getElementById('root');
 
 function renderPage() {
+    if (currentServicePage && currentServicePage.cleanup) {
+        currentServicePage.cleanup();
+        currentServicePage = null;
+    }
+
     root.innerHTML = '';
 
     const header = new HeaderComponent(root);
@@ -26,12 +32,13 @@ function renderPage() {
         const mainPage = new MainPage(contentDiv);
         mainPage.render(navigateTo);
     }
-    else if (currentPage === 'services') {
+    else if (currentPage === 'security_service') {
         const servicesPage = new ServicesPage(contentDiv);
         servicesPage.render(navigateTo);
     }
     else if (currentPage === 'service' && selectedId) {
         const servicePage = new ServicePage(contentDiv, selectedId, isEditMode);
+        currentServicePage = servicePage;
         servicePage.render(navigateTo);
     }
     else if (currentPage === 'request') {
@@ -49,9 +56,11 @@ function navigateTo(page, slug = null, id = null, edit = false) {
     selectedId = id;
     isEditMode = edit;
 
-    // Обновляем URL в браузере (без перезагрузки)
     if (page === 'service' && slug && typeof id === 'number' && !isNaN(id)) {
         window.history.pushState({}, '', `/${slug}/${id}`);
+    }
+    else if (page === 'security_service') {
+        window.history.pushState({}, '', '/security_service');
     }
     else if (page === 'main') {
         window.history.pushState({}, '', '/');

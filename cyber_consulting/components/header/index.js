@@ -13,7 +13,6 @@ export class HeaderComponent {
                         </div>
                         <div class="col-md-6 text-end">
                             <i class="far fa-clock"></i> Пн-Пт: 9:00 - 20:00
-                            <a href="#" class="ms-3" id="request-link-header">Оставить заявку</a>
                         </div>
                     </div>
                 </div>
@@ -23,7 +22,9 @@ export class HeaderComponent {
                     <div class="row align-items-center">
                         <div class="col-md-4">
                             <div class="logo">
-                                Cyber<span style="color:#ff9800;">Consult</span>
+                                <a href="#" id="nav-main" style="text-decoration: none; color: inherit;">
+                                    Cyber<span style="color:#ff9800;">Consult</span>
+                                </a>
                             </div>
                         </div>
                         <div class="col-md-4 text-center">
@@ -39,35 +40,28 @@ export class HeaderComponent {
             </div>
             <div class="nav-menu">
                 <div class="container">
-                    <a href="#" id="nav-main">Главная</a>
                     <a href="#" id="nav-services">Услуги</a>
-                    <a href="#" id="nav-request">Заявка на консалтинг</a>
-                    <a href="#">Отзывы</a>
-                    <a href="#">Поддержка</a>
-                    <a href="#">О компании</a>
-                    <a href="#" class="float-end"><i class="far fa-user"></i> Личный кабинет</a>
                 </div>
             </div>
         `;
     }
 
     addListeners(navigate) {
-        document.getElementById('nav-main')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate('main');
-        });
-        document.getElementById('nav-services')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate('services');
-        });
-        document.getElementById('nav-request')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate('request');
-        });
-        document.getElementById('request-link-header')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate('request');
-        });
+        const navMain = document.getElementById('nav-main');
+        if (navMain) {
+            navMain.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigate('main');
+            });
+        }
+
+        const navServices = document.getElementById('nav-services');
+        if (navServices) {
+            navServices.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigate('security_service');
+            });
+        }
     }
 
     render(navigate) {

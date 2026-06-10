@@ -1,4 +1,3 @@
-import { ajax } from "../../modules/ajax.js";
 import { serviceUrls } from "../../modules/urls.js";
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
@@ -67,7 +66,28 @@ export class MainPage {
     }
 
     getHTML() {
-        return `<div id="services-list" class="row"></div>`;
+        return `
+            <div class="text-center mb-4">
+                <button id="allServicesBtn" class="btn btn-outline-primary">📋 Все услуги</button>
+            </div>
+            <div id="services-list" class="row"></div>
+        `;
+    }
+
+    async deleteService(serviceId, navigate) {
+        try {
+            const response = await fetch(serviceUrls.getServiceById(serviceId), {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                console.log(`Услуга ${serviceId} удалена`);
+                this.loadServices(navigate);
+            } else {
+                console.error('Ошибка удаления');
+            }
+        } catch (error) {
+            console.error('Ошибка DELETE:', error);
+        }
     }
 
     renderServices(services, navigate) {
@@ -76,14 +96,11 @@ export class MainPage {
         servicesList.innerHTML = '';
 
         services.forEach(service => {
-            // Проверка id
             const actualId = Number(service.id);
             if (isNaN(actualId)) {
                 console.error('ID не число, пропускаем:', service);
                 return;
             }
-
-            console.log('service.id:', service.id, typeof service.id);
 
             const col = document.createElement('div');
             col.className = 'col-md-3 mb-4';
@@ -95,6 +112,7 @@ export class MainPage {
                     <div>
                         <button class="btn btn-sm btn-primary view-btn">Подробнее</button>
                         <button class="btn btn-sm btn-warning edit-btn ms-2">✏️ Редактировать</button>
+                        <button class="btn btn-sm btn-danger delete-btn ms-2">🗑️ Удалить</button>
                     </div>
                 </div>
             `;
@@ -115,21 +133,38 @@ export class MainPage {
                     navigate('service', 'security_service', actualId, true);
                 });
             }
+
+            const deleteBtn = col.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await this.deleteService(actualId, navigate);
+                });
+            }
         });
     }
 
-    loadServices(navigate) {
-        ajax.get(serviceUrls.getServices(), (data) => {
+    async loadServices(navigate) {
+        try {
+            const response = await fetch(serviceUrls.getServices());
+            const data = await response.json();
             if (Array.isArray(data)) {
                 this.renderServices(data, navigate);
             } else {
                 console.error('Ошибка загрузки услуг');
             }
-        });
+        } catch (error) {
+            console.error('Ошибка fetch:', error);
+        }
     }
 
     render(navigate) {
         this.parent.innerHTML = this.getHTML();
         this.loadServices(navigate);
+
+        const allServicesBtn = document.getElementById('allServicesBtn');
+        if (allServicesBtn) {
+            allServicesBtn.addEventListener('click', () => navigate('security_service'));
+        }
     }
 }

@@ -1,6 +1,4 @@
 import { ServiceCardComponent } from "../../components/service-card/index.js";
-import { BackButtonComponent } from "../../components/back-button/index.js";
-import { ajax } from "../../modules/ajax.js";
 import { serviceUrls } from "../../modules/urls.js";
 
 export class ServicesPage {
@@ -12,7 +10,6 @@ export class ServicesPage {
     getHTML() {
         return `
             <div class="container my-4">
-                <div id="back-button-placeholder"></div>
                 <div class="section-title">
                     <h2>Все услуги</h2>
                 </div>
@@ -33,6 +30,22 @@ export class ServicesPage {
         `;
     }
 
+    async deleteService(serviceId, navigate) {
+        try {
+            const response = await fetch(serviceUrls.getServiceById(serviceId), {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                console.log(`Услуга ${serviceId} удалена`);
+                this.loadServices(navigate);
+            } else {
+                console.error('Ошибка удаления');
+            }
+        } catch (error) {
+            console.error('Ошибка DELETE:', error);
+        }
+    }
+
     renderServices(services, navigate) {
         const servicesList = document.getElementById('services-list');
         servicesList.innerHTML = '';
@@ -43,37 +56,62 @@ export class ServicesPage {
         }
 
         services.forEach(service => {
-            // Приводим данные сервера к формату, который ждёт ServiceCardComponent
-            const adaptedService = {
-                ...service,
-                title: service.name,
-                icon: service.icon || '📋'
-            };
-            const card = new ServiceCardComponent(servicesList);
-            card.render(adaptedService, () => navigate('service', 'security_service', service.id, false));
+            const col = document.createElement('div');
+            col.className = 'col-md-3 mb-4';
+            col.innerHTML = `
+                <div class="card-service text-center p-3">
+                    <h5 class="mt-3">${service.name}</h5>
+                    <p>${service.description || ''}</p>
+                    <p><strong>${service.price} ₽/час</strong></p>
+                    <div>
+                        <button class="btn btn-sm btn-primary view-btn">Подробнее</button>
+                        <button class="btn btn-sm btn-warning edit-btn ms-2">✏️ Редактировать</button>
+                        <button class="btn btn-sm btn-danger delete-btn ms-2">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `;
+            servicesList.appendChild(col);
+
+            const viewBtn = col.querySelector('.view-btn');
+            if (viewBtn) {
+                viewBtn.addEventListener('click', () => navigate('service', 'security_service', service.id, false));
+            }
+
+            const editBtn = col.querySelector('.edit-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigate('service', 'security_service', service.id, true);
+                });
+            }
+
+            const deleteBtn = col.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await this.deleteService(service.id, navigate);
+                });
+            }
         });
     }
 
-    loadServices(navigate) {
-        ajax.get(serviceUrls.getServices(), (data) => {
+    async loadServices(navigate) {
+        try {
+            const response = await fetch(serviceUrls.getServices());
+            const data = await response.json();
             if (Array.isArray(data)) {
                 this.allServices = data;
                 this.renderServices(this.allServices, navigate);
             } else {
                 console.error('Ошибка загрузки услуг');
             }
-        });
+        } catch (error) {
+            console.error('Ошибка fetch:', error);
+        }
     }
 
     render(navigate) {
         this.parent.innerHTML = this.getHTML();
-
-        // Кнопка назад
-        const backPlaceholder = document.getElementById('back-button-placeholder');
-        const backButton = new BackButtonComponent(backPlaceholder);
-        backButton.render(() => navigate('main'));
-
-        // Загружаем услуги с сервера
         this.loadServices(navigate);
 
         // Поиск
