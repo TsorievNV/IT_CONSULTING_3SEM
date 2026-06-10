@@ -38,11 +38,6 @@ export class HeaderComponent {
                     </div>
                 </div>
             </div>
-            <div class="nav-menu">
-                <div class="container">
-                    <a href="#" id="nav-services">Услуги</a>
-                </div>
-            </div>
         `;
     }
 
@@ -52,14 +47,6 @@ export class HeaderComponent {
             navMain.addEventListener('click', (e) => {
                 e.preventDefault();
                 navigate('main');
-            });
-        }
-
-        const navServices = document.getElementById('nav-services');
-        if (navServices) {
-            navServices.addEventListener('click', (e) => {
-                e.preventDefault();
-                navigate('security_service');
             });
         }
     }
