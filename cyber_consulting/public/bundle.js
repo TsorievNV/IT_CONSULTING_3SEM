@@ -32,12 +32,7 @@ import*as e from"https://unpkg.com/three@0.160.0/build/three.module.js";import{G
                     </div>
                 </div>
             </div>
-            <div class="nav-menu">
-                <div class="container">
-                    <a href="#" id="nav-services">Услуги</a>
-                </div>
-            </div>
-        `}addListeners(e){let t=document.getElementById(`nav-main`);t&&t.addEventListener(`click`,t=>{t.preventDefault(),e(`main`)});let n=document.getElementById(`nav-services`);n&&n.addEventListener(`click`,t=>{t.preventDefault(),e(`security_service`)})}render(e){this.parent.insertAdjacentHTML(`beforeend`,this.getHTML()),this.addListeners(e)}},a=class{constructor(e){this.parent=e}getHTML(){return`
+        `}addListeners(e){let t=document.getElementById(`nav-main`);t&&t.addEventListener(`click`,t=>{t.preventDefault(),e(`main`)})}render(e){this.parent.insertAdjacentHTML(`beforeend`,this.getHTML()),this.addListeners(e)}},a=class{constructor(e){this.parent=e}getHTML(){return`
             <footer>
                 <div class="container">
                     <div class="row">
